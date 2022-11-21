@@ -7,43 +7,52 @@
     tools:context=".MainActivity">
 
     <androidx.gridlayout.widget.GridLayout
-        android:layout_width="783dp"
-        android:layout_height="391dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.103"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.494">
 
-        <Button
-            android:id="@+id/button14"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
+        <ImageButton
+            android:id="@+id/buttonForward"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleX="1"
+            android:scaleY="1"
             app:layout_column="1"
-            app:layout_row="0" />
+            app:layout_row="0"
+            app:srcCompat="@drawable/arrow_up"
+            android:contentDescription="@string/move_forward" />
 
-        <Button
-            android:id="@+id/button15"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
+        <ImageButton
+            android:id="@+id/buttonLeft"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_column="0"
-            app:layout_row="1" />
+            app:layout_row="1"
+            app:srcCompat="@drawable/arrow_left"
+            android:contentDescription="@string/move_left" />
 
-        <Button
-            android:id="@+id/button16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
+        <ImageButton
+            android:id="@+id/buttonRight"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_column="2"
-            app:layout_row="1" />
+            app:layout_row="1"
+            app:srcCompat="@drawable/arrow_right"
+            android:contentDescription="@string/move_right" />
 
-        <Button
-            android:id="@+id/button19"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
+        <ImageButton
+            android:id="@+id/buttonBackwards"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             app:layout_column="1"
-            app:layout_row="2" />
+            app:layout_row="2"
+            app:srcCompat="@drawable/arrow_down"
+            android:contentDescription="@string/move_backwards" />
+
     </androidx.gridlayout.widget.GridLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
