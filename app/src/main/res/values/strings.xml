@@ -4,4 +4,6 @@
     <string name="move_left">Moves the rover to the left</string>
     <string name="move_right">Moves the rover to the right</string>
     <string name="move_backwards">Moves the rover backwards</string>
+    <string name="stop">Stops the rover</string>
+    <string name="title_activity_main">SawppyUI Controller</string>
 </resources>
