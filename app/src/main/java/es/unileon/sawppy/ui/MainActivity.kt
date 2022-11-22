@@ -97,7 +97,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onDestroy() {
 		super.onDestroy()
 
-		this.movementHandler.stop()
+		this.movementHandler.setAction(Action.STOP)
 		this.bluetoothThread.cancel()
 	}
 
@@ -106,35 +106,35 @@ class MainActivity : AppCompatActivity() {
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveForward(view: View) = this.movementHandler.performAction(Action.FORWARD)
+	fun moveForward(view: View) = this.movementHandler.setAction(Action.FORWARD)
 
 	/**
 	 * Called when the backward button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveBackward(view: View) = this.movementHandler.performAction(Action.BACKWARD)
+	fun moveBackward(view: View) = this.movementHandler.setAction(Action.BACKWARD)
 
 	/**
 	 * Called when the left button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveLeft(view: View) = this.movementHandler.performAction(Action.LEFT)
+	fun moveLeft(view: View) = this.movementHandler.setAction(Action.LEFT)
 
 	/**
 	 * Called when the right button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveRight(view: View) = this.movementHandler.performAction(Action.RIGHT)
+	fun moveRight(view: View) = this.movementHandler.setAction(Action.RIGHT)
 
 	/**
 	 * Called when the stop button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun stop(view: View) = this.movementHandler.stop()
+	fun stop(view: View) = this.movementHandler.setAction(Action.STOP)
 
 	/**
 	 * Called when the manual control button is clicked.
@@ -144,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 	 * Enables all the control buttons.
 	 */
 	fun manualControl(view: View) {
-		this.movementHandler.manualControl()
+		this.movementHandler.setAction(Action.MANUAL)
 		this.manualControlButton.isEnabled = false
 		this.automaticControlButton.isEnabled = true
 		this.enableButtons()
@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
 		this.disableButtons()
 		this.manualControlButton.isEnabled = true
 		this.automaticControlButton.isEnabled = false
-		this.movementHandler.automaticControl()
+		this.movementHandler.setAction(Action.AUTO)
 	}
 
 	/**
