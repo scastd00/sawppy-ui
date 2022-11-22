@@ -41,10 +41,6 @@ data class Action(val signalToSend: Int) {
 
 		val signalNumberToSend = signalString.substring(1).toInt()
 
-		return """
-			{
-				"$actionType": "$signalNumberToSend"
-			}
-		""".trimIndent()
+		return """{"$actionType": "$signalNumberToSend"}"""
 	}
 }
