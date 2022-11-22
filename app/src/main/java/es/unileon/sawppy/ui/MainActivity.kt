@@ -17,11 +17,22 @@ import androidx.core.app.ActivityCompat
 import java.io.IOException
 import java.util.UUID
 
+/**
+ * Main activity of the application.
+ */
 class MainActivity : AppCompatActivity() {
-	private val movementHandler = MovementHandler()
+	private val movementHandler: MovementHandler = MovementHandler()
 	private val bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-	private var bluetoothThread: BluetoothInitializationThread? = null
+	private lateinit var bluetoothThread: BluetoothInitializationThread
 
+	/**
+	 * Called when the activity is created.
+	 *
+	 * @param savedInstanceState The saved instance state.
+	 * @see AppCompatActivity.onCreate
+	 *
+	 * Retrieves the Bluetooth device and creates a new BluetoothInitializationThread to connect to it.
+	 */
 	@RequiresApi(Build.VERSION_CODES.S)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -55,38 +66,67 @@ class MainActivity : AppCompatActivity() {
 
 		device?.let {
 			this.bluetoothThread = BluetoothInitializationThread(it)
-			this.bluetoothThread?.start()
+			this.bluetoothThread.start()
 		}
 	}
 
+	/**
+	 * Called when the activity is destroyed.
+	 *
+	 * @see AppCompatActivity.onDestroy
+	 *
+	 * Stops the movement handler and closes the Bluetooth connection.
+	 */
 	@RequiresApi(Build.VERSION_CODES.S)
 	override fun onDestroy() {
 		super.onDestroy()
 
 		this.movementHandler.stop()
-		this.bluetoothThread?.cancel()
+		this.bluetoothThread.cancel()
 	}
 
-	fun moveForward(view: View) {
-		this.movementHandler.performAction(ActionType.FORWARD)
-	}
+	/**
+	 * Called when the forward button is clicked.
+	 *
+	 * @param view The view that was clicked.
+	 */
+	fun moveForward(view: View) = this.movementHandler.performAction(ActionType.FORWARD)
 
-	fun moveBackward(view: View) {
-		this.movementHandler.performAction(ActionType.BACKWARD)
-	}
+	/**
+	 * Called when the backward button is clicked.
+	 *
+	 * @param view The view that was clicked.
+	 */
+	fun moveBackward(view: View) = this.movementHandler.performAction(ActionType.BACKWARD)
 
-	fun moveLeft(view: View) {
-		this.movementHandler.performAction(ActionType.LEFT)
-	}
+	/**
+	 * Called when the left button is clicked.
+	 *
+	 * @param view The view that was clicked.
+	 */
+	fun moveLeft(view: View) = this.movementHandler.performAction(ActionType.LEFT)
 
-	fun moveRight(view: View) {
-		this.movementHandler.performAction(ActionType.RIGHT)
-	}
+	/**
+	 * Called when the right button is clicked.
+	 *
+	 * @param view The view that was clicked.
+	 */
+	fun moveRight(view: View) = this.movementHandler.performAction(ActionType.RIGHT)
 
-	fun stop(view: View) {
-		this.movementHandler.stop()
-	}
+	/**
+	 * Called when the stop button is clicked.
+	 *
+	 * @param view The view that was clicked.
+	 */
+	fun stop(view: View) = this.movementHandler.stop()
 
+	/**
+	 * Called when the manual control button is clicked.
+	 *
+	 * @param view The view.
+	 *
+	 * Enables all the control buttons.
+	 */
 	fun manualControl(view: View) {
 		this.movementHandler.manualControl()
 
@@ -96,6 +136,13 @@ class MainActivity : AppCompatActivity() {
 		findViewById<Button>(R.id.buttonRight).isEnabled = true
 	}
 
+	/**
+	 * Called when the automatic control button is clicked.
+	 *
+	 * @param view The view.
+	 *
+	 * Disables all the control buttons.
+	 */
 	fun automaticControl(view: View) {
 		findViewById<Button>(R.id.buttonForward).isEnabled = false
 		findViewById<Button>(R.id.buttonBackwards).isEnabled = false
@@ -105,6 +152,9 @@ class MainActivity : AppCompatActivity() {
 		this.movementHandler.automaticControl()
 	}
 
+	/**
+	 * Thread that initializes the Bluetooth connection.
+	 */
 	@RequiresApi(Build.VERSION_CODES.S)
 	private inner class BluetoothInitializationThread(device: BluetoothDevice) : Thread() {
 		private val mmSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
@@ -137,6 +187,9 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 
+		/**
+		 * Requests for permission to use the Bluetooth connection and creates the BluetoothSocket.
+		 */
 		override fun run() {
 			Log.d(TAG, "BluetoothInitializationThread started")
 
@@ -168,7 +221,9 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 
-		// Closes the client socket and causes the thread to finish.
+		/**
+		 * Closes the client socket and causes the thread to finish.
+		 */
 		fun cancel() {
 			try {
 				// Since the socket that we created is assigned to the MovementHandler, we don't need to close it here.
@@ -180,6 +235,11 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
+	/**
+	 * Sets the socket to the MovementHandler.
+	 *
+	 * @param bluetoothSocket The socket.
+	 */
 	private fun setSocket(bluetoothSocket: BluetoothSocket) {
 		this.movementHandler.bluetoothSocket = bluetoothSocket
 	}
