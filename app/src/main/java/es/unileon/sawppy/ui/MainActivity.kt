@@ -45,11 +45,19 @@ class MainActivity : AppCompatActivity() {
 	@RequiresApi(Build.VERSION_CODES.S)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		setContentView(R.layout.activity_main)
+		this.setContentView(R.layout.activity_main)
+		this.findAndConnectBluetoothDevice()
+	}
 
-		// See https://developer.android.com/guide/topics/connectivity/bluetooth/connect-bluetooth-devices
-		// And https://developer.android.com/guide/topics/connectivity/bluetooth/transfer-data
-
+	/**
+	 * Finds the Bluetooth device and creates a new BluetoothInitializationThread to connect to it.
+	 *
+	 * Internet resources:
+	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/connect-bluetooth-devices
+	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/transfer-data
+	 */
+	@RequiresApi(Build.VERSION_CODES.S)
+	private fun findAndConnectBluetoothDevice() {
 		// Create a bluetooth connection
 		val pairedDevices: Set<BluetoothDevice>? = if (ActivityCompat.checkSelfPermission(
 				this,
