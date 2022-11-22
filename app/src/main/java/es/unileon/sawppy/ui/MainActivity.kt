@@ -10,10 +10,14 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import kotlinx.android.synthetic.main.activity_main.buttonBackwards
+import kotlinx.android.synthetic.main.activity_main.buttonForward
+import kotlinx.android.synthetic.main.activity_main.buttonLeft
+import kotlinx.android.synthetic.main.activity_main.buttonRight
+import kotlinx.android.synthetic.main.activity_main.buttonStop
 import java.io.IOException
 import java.util.UUID
 
@@ -129,11 +133,7 @@ class MainActivity : AppCompatActivity() {
 	 */
 	fun manualControl(view: View) {
 		this.movementHandler.manualControl()
-
-		findViewById<Button>(R.id.buttonForward).isEnabled = true
-		findViewById<Button>(R.id.buttonBackwards).isEnabled = true
-		findViewById<Button>(R.id.buttonLeft).isEnabled = true
-		findViewById<Button>(R.id.buttonRight).isEnabled = true
+		this.enableButtons()
 	}
 
 	/**
@@ -144,12 +144,32 @@ class MainActivity : AppCompatActivity() {
 	 * Disables all the control buttons.
 	 */
 	fun automaticControl(view: View) {
-		findViewById<Button>(R.id.buttonForward).isEnabled = false
-		findViewById<Button>(R.id.buttonBackwards).isEnabled = false
-		findViewById<Button>(R.id.buttonLeft).isEnabled = false
-		findViewById<Button>(R.id.buttonRight).isEnabled = false
-
+		this.disableButtons()
 		this.movementHandler.automaticControl()
+	}
+
+	/**
+	 * Enables all the control buttons.
+	 *
+	 * See "https://devexperto.com/kotlin-android-extensions" for better understanding of the syntax.
+	 */
+	private fun enableButtons() {
+		buttonForward.isEnabled = true
+		buttonBackwards.isEnabled = true
+		buttonLeft.isEnabled = true
+		buttonRight.isEnabled = true
+		buttonStop.isEnabled = true
+	}
+
+	/**
+	 * Disables all the control buttons.
+	 */
+	private fun disableButtons() {
+		buttonForward.isEnabled = false
+		buttonBackwards.isEnabled = false
+		buttonLeft.isEnabled = false
+		buttonRight.isEnabled = false
+		buttonStop.isEnabled = false
 	}
 
 	/**
