@@ -68,19 +68,19 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	fun moveForward(view: View) {
-		this.movementHandler.move(MovementType.FORWARD)
+		this.movementHandler.performAction(ActionType.FORWARD)
 	}
 
 	fun moveBackward(view: View) {
-		this.movementHandler.move(MovementType.BACKWARD)
+		this.movementHandler.performAction(ActionType.BACKWARD)
 	}
 
 	fun moveLeft(view: View) {
-		this.movementHandler.move(MovementType.LEFT)
+		this.movementHandler.performAction(ActionType.LEFT)
 	}
 
 	fun moveRight(view: View) {
-		this.movementHandler.move(MovementType.RIGHT)
+		this.movementHandler.performAction(ActionType.RIGHT)
 	}
 
 	fun stop(view: View) {

@@ -6,7 +6,7 @@ import org.intellij.lang.annotations.Language
 class MovementHandler {
 	var bluetoothSocket: BluetoothSocket? = null
 
-	fun move(type: MovementType) {
+	fun performAction(type: ActionType) {
 		println("Moving ${type.signalToSend}")
 
 		this.sendSignal(
@@ -20,14 +20,7 @@ class MovementHandler {
 
 	fun stop() {
 		println("Stopping")
-
-		this.sendSignal(
-			"""
-				{
-					"movement": "stop"
-				}
-			""".trimIndent()
-		)
+		this.performAction(ActionType.STOP)
 	}
 
 	fun manualControl() {
