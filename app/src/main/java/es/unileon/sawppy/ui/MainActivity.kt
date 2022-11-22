@@ -16,11 +16,13 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
+import kotlinx.android.synthetic.main.activity_main.automaticControlButton
 import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
 import kotlinx.android.synthetic.main.activity_main.buttonRight
 import kotlinx.android.synthetic.main.activity_main.buttonStop
+import kotlinx.android.synthetic.main.activity_main.manualControlButton
 import java.io.IOException
 import java.util.UUID
 
@@ -136,6 +138,8 @@ class MainActivity : AppCompatActivity() {
 	 */
 	fun manualControl(view: View) {
 		this.movementHandler.manualControl()
+		this.manualControlButton.isEnabled = false
+		this.automaticControlButton.isEnabled = true
 		this.enableButtons()
 	}
 
@@ -148,6 +152,8 @@ class MainActivity : AppCompatActivity() {
 	 */
 	fun automaticControl(view: View) {
 		this.disableButtons()
+		this.manualControlButton.isEnabled = true
+		this.automaticControlButton.isEnabled = false
 		this.movementHandler.automaticControl()
 	}
 
