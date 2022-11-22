@@ -1,11 +1,13 @@
 package es.unileon.sawppy.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,7 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.ViewCompat
 import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
@@ -153,23 +156,43 @@ class MainActivity : AppCompatActivity() {
 	 *
 	 * See "https://devexperto.com/kotlin-android-extensions" for better understanding of the syntax.
 	 */
+	@SuppressLint("UseCompatLoadingForDrawables")
 	private fun enableButtons() {
-		buttonForward.isEnabled = true
-		buttonBackwards.isEnabled = true
-		buttonLeft.isEnabled = true
-		buttonRight.isEnabled = true
-		buttonStop.isEnabled = true
+		arrayOf(
+			this.buttonForward,
+			this.buttonBackwards,
+			this.buttonLeft,
+			this.buttonRight,
+			this.buttonStop
+		).forEach {
+			it.isEnabled = true
+			ViewCompat.setBackgroundTintList(
+				it, ColorStateList.valueOf(
+					this.getColor(R.color.enabled_control_button)
+				)
+			)
+		}
 	}
 
 	/**
 	 * Disables all the control buttons.
 	 */
+	@SuppressLint("UseCompatLoadingForDrawables")
 	private fun disableButtons() {
-		buttonForward.isEnabled = false
-		buttonBackwards.isEnabled = false
-		buttonLeft.isEnabled = false
-		buttonRight.isEnabled = false
-		buttonStop.isEnabled = false
+		arrayOf(
+			this.buttonForward,
+			this.buttonBackwards,
+			this.buttonLeft,
+			this.buttonRight,
+			this.buttonStop
+		).forEach {
+			it.isEnabled = false
+			ViewCompat.setBackgroundTintList(
+				it, ColorStateList.valueOf(
+					this.getColor(R.color.disabled_control_button)
+				)
+			)
+		}
 	}
 
 	/**
