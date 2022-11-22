@@ -1,6 +1,7 @@
 package es.unileon.sawppy.ui
 
 import android.bluetooth.BluetoothSocket
+import android.util.Log
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.timer
 
@@ -9,22 +10,21 @@ import kotlin.concurrent.timer
  */
 class MovementHandler {
 	var bluetoothSocket: BluetoothSocket? = null
-	private val actionToSend: AtomicReference<Action> = AtomicReference()
+	private val actionToSend: AtomicReference<Action> = AtomicReference(Action.MANUAL)
 	private val taskExecutor = timer(
 		name = "RoverDataSender-Timer",
 		daemon = true,
 		initialDelay = 0,
 		period = 100
 	) {
-		var action = actionToSend.get()
-
-		// First action to send to the rover is always Manual, then it is set to Stop.
-		if (action == null) {
-			action = Action.MANUAL
-			actionToSend.set(Action.STOP)
-		}
-
+		val action = actionToSend.get()
 		sendBytes(action.toString())
+
+		// When a control action was sent, the rover will stop moving in the next iteration.
+		if (action.isControl()) {
+			actionToSend.set(Action.STOP)
+			Log.d("MovementHandler", "Control action sent. Rover will stop moving.")
+		}
 	}
 
 	/**
