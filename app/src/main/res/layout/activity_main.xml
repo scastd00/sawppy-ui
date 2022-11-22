@@ -6,8 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/otherActionsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/other_actions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.708" />
+
     <androidx.gridlayout.widget.GridLayout
-        android:id="@+id/gridLayout"
+        android:id="@+id/otherLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.85">
+
+        <Button
+            android:id="@+id/manualControlButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="manualControl"
+            android:text="@string/manual_control"
+            app:layout_column="0"
+            app:layout_gravity="center"
+            app:layout_row="0" />
+
+        <Button
+            android:id="@+id/automaticControlButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="automaticControl"
+            android:text="@string/automatic_control"
+            app:layout_column="0"
+            app:layout_gravity="center"
+            app:layout_row="1" />
+
+    </androidx.gridlayout.widget.GridLayout>
+
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/movementLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -60,7 +104,7 @@
             app:srcCompat="@drawable/arrow_down" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/buttonStop"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:contentDescription="@string/stop"

@@ -6,4 +6,7 @@
     <string name="move_backwards">Moves the rover backwards</string>
     <string name="stop">Stops the rover</string>
     <string name="title_activity_main">SawppyUI Controller</string>
+    <string name="other_actions">Other actions</string>
+    <string name="manual_control">Manual control</string>
+    <string name="automatic_control">Automatic control</string>
 </resources>
