@@ -76,15 +76,14 @@ class MainActivity : AppCompatActivity() {
 			this.bluetoothAdapter.bondedDevices
 		}
 
-		// Todo: We search by MAC or by UUID?
-		val device: BluetoothDevice? = pairedDevices?.firstOrNull {
-			it.address.equals(BLUETOOTH_MAC, true)
-		}
-
-		device?.let {
-			this.bluetoothThread = BluetoothInitializationThread(it)
-			this.bluetoothThread.start()
-		}
+		pairedDevices
+			?.filter { it.address.equals(BLUETOOTH_MAC, true) }
+			?.filter { it.uuids.any { uuid -> uuid.uuid.equals(BLUETOOTH_UUID) } }
+			?.get(0)
+			?.let {
+				this.bluetoothThread = BluetoothInitializationThread(it)
+				this.bluetoothThread.start()
+			}
 	}
 
 	/**
