@@ -2,19 +2,23 @@ package es.unileon.sawppy.ui
 
 import android.bluetooth.BluetoothSocket
 import org.intellij.lang.annotations.Language
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * Class that handles the movement of the robot.
  */
 class MovementHandler {
 	var bluetoothSocket: BluetoothSocket? = null
+	private val actionToSend: AtomicReference<Action> = AtomicReference(Action.MANUAL)
+
+	// Todo: first action must be Manual Control (Action(207)) then Stop (Action(105))
 
 	/**
 	 * Sends a command to the rover.
 	 *
 	 * @param type The command type to send.
 	 */
-	fun performAction(type: ActionType) {
+	fun performAction(type: Action) {
 		println("Moving ${type.signalToSend}")
 
 		this.sendSignal(
@@ -31,7 +35,7 @@ class MovementHandler {
 	 */
 	fun stop() {
 		println("Stopping")
-		this.performAction(ActionType.STOP)
+		this.performAction(Action.STOP)
 	}
 
 	/**

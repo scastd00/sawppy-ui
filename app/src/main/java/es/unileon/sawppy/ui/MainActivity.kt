@@ -107,28 +107,28 @@ class MainActivity : AppCompatActivity() {
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveForward(view: View) = this.movementHandler.performAction(ActionType.FORWARD)
+	fun moveForward(view: View) = this.movementHandler.performAction(Action.FORWARD)
 
 	/**
 	 * Called when the backward button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveBackward(view: View) = this.movementHandler.performAction(ActionType.BACKWARD)
+	fun moveBackward(view: View) = this.movementHandler.performAction(Action.BACKWARD)
 
 	/**
 	 * Called when the left button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveLeft(view: View) = this.movementHandler.performAction(ActionType.LEFT)
+	fun moveLeft(view: View) = this.movementHandler.performAction(Action.LEFT)
 
 	/**
 	 * Called when the right button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveRight(view: View) = this.movementHandler.performAction(ActionType.RIGHT)
+	fun moveRight(view: View) = this.movementHandler.performAction(Action.RIGHT)
 
 	/**
 	 * Called when the stop button is clicked.
