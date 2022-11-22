@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.setContentView(R.layout.activity_main)
+		this.keepPressedButtonBackground(buttonStop)
 		this.findAndConnectBluetoothDevice()
 	}
 
@@ -106,35 +107,59 @@ class MainActivity : AppCompatActivity() {
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveForward(view: View) = this.movementHandler.setAction(Action.FORWARD)
+	fun moveForward(view: View) {
+		this.movementHandler.setAction(Action.FORWARD)
+		this.keepPressedButtonBackground(view)
+	}
 
 	/**
 	 * Called when the backward button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveBackward(view: View) = this.movementHandler.setAction(Action.BACKWARD)
+	fun moveBackward(view: View) {
+		this.movementHandler.setAction(Action.BACKWARD)
+		this.keepPressedButtonBackground(view)
+	}
 
 	/**
 	 * Called when the left button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveLeft(view: View) = this.movementHandler.setAction(Action.LEFT)
+	fun moveLeft(view: View) {
+		this.movementHandler.setAction(Action.LEFT)
+		this.keepPressedButtonBackground(view)
+	}
 
 	/**
 	 * Called when the right button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun moveRight(view: View) = this.movementHandler.setAction(Action.RIGHT)
+	fun moveRight(view: View) {
+		this.movementHandler.setAction(Action.RIGHT)
+		this.keepPressedButtonBackground(view)
+	}
 
 	/**
 	 * Called when the stop button is clicked.
 	 *
 	 * @param view The view that was clicked.
 	 */
-	fun stop(view: View) = this.movementHandler.setAction(Action.STOP)
+	fun stop(view: View) {
+		this.movementHandler.setAction(Action.STOP)
+		this.keepPressedButtonBackground(view)
+	}
+
+	private fun keepPressedButtonBackground(view: View) {
+		this.enableButtons()
+		ViewCompat.setBackgroundTintList(
+			view, ColorStateList.valueOf(
+				this.getColor(R.color.pressed_control_button)
+			)
+		)
+	}
 
 	/**
 	 * Called when the manual control button is clicked.
@@ -147,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 		this.movementHandler.setAction(Action.MANUAL)
 		this.manualControlButton.isEnabled = false
 		this.automaticControlButton.isEnabled = true
-		this.enableButtons()
+		this.keepPressedButtonBackground(buttonStop)
 	}
 
 	/**

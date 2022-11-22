@@ -9,4 +9,5 @@
 	<color name="white">#FFFFFFFF</color>
 	<color name="enabled_control_button">#FBC02D</color>
 	<color name="disabled_control_button">#33FBC02D</color>
+	<color name="pressed_control_button">#64DD17</color>
 </resources>
