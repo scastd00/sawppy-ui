@@ -1,6 +1,8 @@
 package es.unileon.sawppy.ui
 
 import android.bluetooth.BluetoothSocket
+import android.util.Log
+import java.util.Timer
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.timer
 
@@ -10,18 +12,31 @@ import kotlin.concurrent.timer
 class MovementHandler {
 	var bluetoothSocket: BluetoothSocket? = null
 	private val actionToSend: AtomicReference<Action> = AtomicReference(Action.MANUAL)
-	private val taskExecutor = timer(
-		name = "RoverDataSender-Timer",
-		daemon = true,
-		initialDelay = 0,
-		period = 100
-	) {
-		val action = actionToSend.get()
-		sendBytes(action.toString())
+	private lateinit var taskExecutor: Timer
+	private var isRunning = false
 
-		// When a control action was sent, the rover will stop moving in the next iteration.
-		if (action.isControl())
-			actionToSend.set(Action.STOP)
+	/**
+	 * Starts the movement of the rover.
+	 */
+	fun start() {
+		if (isRunning) return
+
+		isRunning = true
+		taskExecutor = timer(
+			name = "RoverDataSender-Timer",
+			daemon = true,
+			initialDelay = 0,
+			period = 100
+		) {
+			val action = actionToSend.get()
+			sendBytes(action.toString())
+
+			Log.d("MovementHandler", "Sending action: $action")
+
+			// When a control action was sent, the rover will stop moving in the next iteration.
+			if (action.isControl())
+				actionToSend.set(Action.STOP)
+		}
 	}
 
 	/**
@@ -39,6 +54,8 @@ class MovementHandler {
 	 * @param action The action to send.
 	 */
 	fun setAction(action: Action) {
+		if (!isRunning) return
+
 		println("Action set: $action")
 		this.actionToSend.set(action)
 	}
@@ -47,6 +64,8 @@ class MovementHandler {
 	 * Handles the end of the connection.
 	 */
 	fun end() {
+		if (!isRunning) return
+
 		this.actionToSend.set(Action.STOP) // Set the action in case a new task is executed (last).
 		this.taskExecutor.cancel() // Cancel the timer.
 		this.sendBytes(Action.STOP.toString()) // Send stop signal to the rover ensure that it stops.

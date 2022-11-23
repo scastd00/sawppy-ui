@@ -15,7 +15,7 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.85">
+		app:layout_constraintVertical_bias="0.893">
 
 		<Button
 			android:id="@+id/manualControlButton"
@@ -37,6 +37,21 @@
 			app:layout_column="0"
 			app:layout_gravity="center"
 			app:layout_row="1" />
+
+		<Space
+			android:layout_width="wrap_content"
+			android:layout_height="30dp"
+			app:layout_column="0"
+			app:layout_row="2" />
+
+		<Button
+			android:id="@+id/connectBluetoothButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/connect_bluetooth"
+			app:layout_column="0"
+			app:layout_gravity="center"
+			app:layout_row="3" />
 
 	</androidx.gridlayout.widget.GridLayout>
 

@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
 import kotlinx.android.synthetic.main.activity_main.buttonRight
 import kotlinx.android.synthetic.main.activity_main.buttonStop
+import kotlinx.android.synthetic.main.activity_main.connectBluetoothButton
 import kotlinx.android.synthetic.main.activity_main.manualControlButton
 import java.io.IOException
 import java.util.UUID
@@ -132,9 +133,13 @@ class MainActivity : AppCompatActivity() {
 	 */
 	fun manualControl(view: View) {
 		this.movementHandler.setAction(Action.MANUAL)
-		this.manualControlButton.isEnabled = false
-		this.automaticControlButton.isEnabled = true
+		this.switchControlButtons()
 		this.keepPressedButtonBackground(buttonStop)
+	}
+
+	private fun switchControlButtons() {
+		this.manualControlButton.isEnabled = !this.manualControlButton.isEnabled
+		this.automaticControlButton.isEnabled = !this.automaticControlButton.isEnabled
 	}
 
 	/**
@@ -146,8 +151,7 @@ class MainActivity : AppCompatActivity() {
 	 */
 	fun automaticControl(view: View) {
 		this.disableButtons()
-		this.manualControlButton.isEnabled = true
-		this.automaticControlButton.isEnabled = false
+		this.switchControlButtons()
 		this.movementHandler.setAction(Action.AUTO)
 	}
 
@@ -317,5 +321,8 @@ class MainActivity : AppCompatActivity() {
 	 */
 	private fun setSocket(bluetoothSocket: BluetoothSocket) {
 		this.movementHandler.bluetoothSocket = bluetoothSocket
+		this.connectBluetoothButton.isEnabled = false
+		this.connectBluetoothButton.text = this.getString(R.string.connected)
+		this.movementHandler.start()
 	}
 }
