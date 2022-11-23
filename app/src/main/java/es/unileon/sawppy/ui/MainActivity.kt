@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
 		this.setContentView(R.layout.activity_main)
 		this.keepPressedButtonBackground(buttonStop)
 		this.findAndConnectBluetoothDevice()
-
 		this.prepareTouchListeners()
 	}
 
