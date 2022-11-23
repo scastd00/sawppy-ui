@@ -11,6 +11,7 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -48,6 +49,8 @@ class MainActivity : AppCompatActivity() {
 		this.setContentView(R.layout.activity_main)
 		this.keepPressedButtonBackground(buttonStop)
 		this.findAndConnectBluetoothDevice()
+
+		this.prepareTouchListeners()
 	}
 
 	/**
@@ -102,58 +105,18 @@ class MainActivity : AppCompatActivity() {
 		this.bluetoothThread.cancel()
 	}
 
-	/**
-	 * Called when the forward button is clicked.
-	 *
-	 * @param view The view that was clicked.
-	 */
-	fun moveForward(view: View) {
-		this.movementHandler.setAction(Action.FORWARD)
-		this.keepPressedButtonBackground(view)
-	}
+	private fun moveForward() = this.movementHandler.setAction(Action.FORWARD)
+	private fun moveBackward() = this.movementHandler.setAction(Action.BACKWARD)
+	private fun moveLeft() = this.movementHandler.setAction(Action.LEFT)
+	private fun moveRight() = this.movementHandler.setAction(Action.RIGHT)
 
-	/**
-	 * Called when the backward button is clicked.
-	 *
-	 * @param view The view that was clicked.
-	 */
-	fun moveBackward(view: View) {
-		this.movementHandler.setAction(Action.BACKWARD)
-		this.keepPressedButtonBackground(view)
-	}
-
-	/**
-	 * Called when the left button is clicked.
-	 *
-	 * @param view The view that was clicked.
-	 */
-	fun moveLeft(view: View) {
-		this.movementHandler.setAction(Action.LEFT)
-		this.keepPressedButtonBackground(view)
-	}
-
-	/**
-	 * Called when the right button is clicked.
-	 *
-	 * @param view The view that was clicked.
-	 */
-	fun moveRight(view: View) {
-		this.movementHandler.setAction(Action.RIGHT)
-		this.keepPressedButtonBackground(view)
-	}
-
-	/**
-	 * Called when the stop button is clicked.
-	 *
-	 * @param view The view that was clicked.
-	 */
-	fun stop(view: View) {
+	private fun stop() {
 		this.movementHandler.setAction(Action.STOP)
-		this.keepPressedButtonBackground(view)
+		this.keepPressedButtonBackground(buttonStop)
 	}
 
 	private fun keepPressedButtonBackground(view: View) {
-		this.enableButtons()
+		this.enableButtons() // Clear background color of all buttons.
 		ViewCompat.setBackgroundTintList(
 			view, ColorStateList.valueOf(
 				this.getColor(R.color.pressed_control_button)
@@ -233,6 +196,37 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
+	private fun prepareTouchListeners() {
+		arrayOf(
+			this.buttonForward,
+			this.buttonBackwards,
+			this.buttonLeft,
+			this.buttonRight,
+			this.buttonStop
+		).forEach {
+			it.setOnTouchListener { view, event ->
+				when (event.action) {
+					MotionEvent.ACTION_DOWN -> {
+						when (view.id) {
+							R.id.buttonForward -> this.moveForward()
+							R.id.buttonBackwards -> this.moveBackward()
+							R.id.buttonLeft -> this.moveLeft()
+							R.id.buttonRight -> this.moveRight()
+							R.id.buttonStop -> this.stop()
+						}
+
+						this.keepPressedButtonBackground(view)
+					}
+
+					MotionEvent.ACTION_UP -> this.stop()
+				}
+
+				true
+			}
+		}
+	}
+
 	/**
 	 * Thread that initializes the Bluetooth connection.
 	 */
@@ -264,8 +258,9 @@ class MainActivity : AppCompatActivity() {
 				return@lazy device.createRfcommSocketToServiceRecord(UUID.fromString(BLUETOOTH_UUID))
 			} catch (e: SecurityException) {
 				Log.e(TAG, "Socket's create() method failed. Permissions required by user", e)
-				return@lazy null
 			}
+
+			return@lazy null
 		}
 
 		/**
