@@ -7,20 +7,6 @@
 	android:background="#B3E5FC"
 	tools:context=".MainActivity">
 
-	<TextView
-		android:id="@+id/otherActionsTextView"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:text="@string/other_actions"
-		android:textColor="#000"
-		android:textSize="20sp"
-		app:layout_constraintBottom_toBottomOf="parent"
-		app:layout_constraintEnd_toEndOf="parent"
-		app:layout_constraintHorizontal_bias="0.498"
-		app:layout_constraintStart_toStartOf="parent"
-		app:layout_constraintTop_toTopOf="parent"
-		app:layout_constraintVertical_bias="0.708" />
-
 	<androidx.gridlayout.widget.GridLayout
 		android:id="@+id/otherLayout"
 		android:layout_width="wrap_content"
