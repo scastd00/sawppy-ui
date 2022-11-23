@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
 import kotlinx.android.synthetic.main.activity_main.buttonRight
-import kotlinx.android.synthetic.main.activity_main.buttonStop
 import kotlinx.android.synthetic.main.activity_main.connectBluetoothButton
 import kotlinx.android.synthetic.main.activity_main.manualControlButton
 import java.io.IOException
@@ -48,9 +47,9 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.setContentView(R.layout.activity_main)
-		this.keepPressedButtonBackground(buttonStop)
 		this.findAndConnectBluetoothDevice()
 		this.prepareTouchListeners()
+		this.movementHandler.start()
 	}
 
 	/**
@@ -103,13 +102,22 @@ class MainActivity : AppCompatActivity() {
 	private fun moveLeft() = this.movementHandler.setAction(Action.LEFT)
 	private fun moveRight() = this.movementHandler.setAction(Action.RIGHT)
 
+	/**
+	 * Establishes the Stop action to be sent by the MovementHandler and clears the
+	 * background of all buttons.
+	 */
 	private fun stop() {
 		this.movementHandler.setAction(Action.STOP)
-		this.keepPressedButtonBackground(buttonStop)
+		this.stateOfButtons(true)
 	}
 
+	/**
+	 * Clears the background of all buttons and sets the background of the given button.
+	 *
+	 * @param view The button to set the background.
+	 */
 	private fun keepPressedButtonBackground(view: View) {
-		this.enableButtons() // Clear background color of all buttons.
+		this.stateOfButtons(true)
 		ViewCompat.setBackgroundTintList(
 			view, ColorStateList.valueOf(
 				this.getColor(R.color.pressed_control_button)
@@ -127,9 +135,12 @@ class MainActivity : AppCompatActivity() {
 	fun manualControl(view: View) {
 		this.movementHandler.setAction(Action.MANUAL)
 		this.switchControlButtons()
-		this.keepPressedButtonBackground(buttonStop)
+		this.stateOfButtons(true)
 	}
 
+	/**
+	 * Alternates between the manual and automatic control buttons.
+	 */
 	private fun switchControlButtons() {
 		this.manualControlButton.isEnabled = !this.manualControlButton.isEnabled
 		this.automaticControlButton.isEnabled = !this.automaticControlButton.isEnabled
@@ -143,50 +154,32 @@ class MainActivity : AppCompatActivity() {
 	 * Disables all the control buttons.
 	 */
 	fun automaticControl(view: View) {
-		this.disableButtons()
+		this.stateOfButtons(false)
 		this.switchControlButtons()
 		this.movementHandler.setAction(Action.AUTO)
 	}
 
 	/**
-	 * Enables all the control buttons.
+	 * Enables or disables all the control buttons and sets the background color
+	 * depending on the state.
+	 *
+	 * @param enabled The state of the buttons.
 	 *
 	 * See "https://devexperto.com/kotlin-android-extensions" for better understanding of the syntax.
 	 */
-	@SuppressLint("UseCompatLoadingForDrawables")
-	private fun enableButtons() {
+	private fun stateOfButtons(enabled: Boolean) {
 		arrayOf(
 			this.buttonForward,
 			this.buttonBackwards,
 			this.buttonLeft,
-			this.buttonRight,
-			this.buttonStop
+			this.buttonRight
 		).forEach {
-			it.isEnabled = true
+			it.isEnabled = enabled
 			ViewCompat.setBackgroundTintList(
 				it, ColorStateList.valueOf(
-					this.getColor(R.color.enabled_control_button)
-				)
-			)
-		}
-	}
-
-	/**
-	 * Disables all the control buttons.
-	 */
-	@SuppressLint("UseCompatLoadingForDrawables")
-	private fun disableButtons() {
-		arrayOf(
-			this.buttonForward,
-			this.buttonBackwards,
-			this.buttonLeft,
-			this.buttonRight,
-			this.buttonStop
-		).forEach {
-			it.isEnabled = false
-			ViewCompat.setBackgroundTintList(
-				it, ColorStateList.valueOf(
-					this.getColor(R.color.disabled_control_button)
+					this.getColor(
+						if (enabled) R.color.enabled_control_button else R.color.disabled_control_button
+					)
 				)
 			)
 		}
@@ -198,8 +191,7 @@ class MainActivity : AppCompatActivity() {
 			this.buttonForward,
 			this.buttonBackwards,
 			this.buttonLeft,
-			this.buttonRight,
-			this.buttonStop
+			this.buttonRight
 		).forEach {
 			it.setOnTouchListener { view, event ->
 				when (event.action) {
@@ -209,7 +201,6 @@ class MainActivity : AppCompatActivity() {
 							R.id.buttonBackwards -> this.moveBackward()
 							R.id.buttonLeft -> this.moveLeft()
 							R.id.buttonRight -> this.moveRight()
-							R.id.buttonStop -> this.stop()
 						}
 
 						this.keepPressedButtonBackground(view)
@@ -228,7 +219,7 @@ class MainActivity : AppCompatActivity() {
 	 */
 	@RequiresApi(Build.VERSION_CODES.S)
 	private inner class BluetoothInitializationThread(device: BluetoothDevice) : Thread() {
-		private val mmSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
+		private val bluetoothSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
 			if (ActivityCompat.checkSelfPermission(
 					this@MainActivity,
 					Manifest.permission.BLUETOOTH_CONNECT
@@ -268,7 +259,7 @@ class MainActivity : AppCompatActivity() {
 			}
 			bluetoothAdapter.cancelDiscovery()
 
-			mmSocket?.let {
+			bluetoothSocket?.let {
 				// Connect to the remote device through the socket. This call blocks
 				// until it succeeds or throws an exception.
 				it.connect()
