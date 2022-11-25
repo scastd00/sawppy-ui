@@ -1,12 +1,10 @@
 package es.unileon.sawppy.ui
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.ContentValues.TAG
-import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -15,7 +13,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import kotlinx.android.synthetic.main.activity_main.automaticControlButton
 import kotlinx.android.synthetic.main.activity_main.buttonBackwards
@@ -47,9 +44,7 @@ class MainActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.setContentView(R.layout.activity_main)
-		this.findAndConnectBluetoothDevice()
 		this.prepareTouchListeners()
-		this.movementHandler.start()
 	}
 
 	/**
@@ -61,25 +56,13 @@ class MainActivity : AppCompatActivity() {
 	 */
 	@RequiresApi(Build.VERSION_CODES.S)
 	private fun findAndConnectBluetoothDevice() {
-		// Create a bluetooth connection
-		val pairedDevices: Set<BluetoothDevice>? = if (ActivityCompat.checkSelfPermission(
-				this,
-				Manifest.permission.BLUETOOTH_CONNECT
-			) == PackageManager.PERMISSION_DENIED
-		) {
-			return
-		} else {
-			this.bluetoothAdapter.bondedDevices
+		try {
+			val device = this.bluetoothAdapter.getRemoteDevice(BLUETOOTH_MAC)
+			this.bluetoothThread = BluetoothInitializationThread(device)
+			this.bluetoothThread.start()
+		} catch (e: SecurityException) {
+			Log.e(TAG, "Error while creating the Bluetooth socket", e)
 		}
-
-		pairedDevices
-			?.filter { it.address.equals(BLUETOOTH_MAC, true) }
-			?.filter { it.uuids.any { uuid -> uuid.uuid.equals(BLUETOOTH_UUID) } }
-			?.get(0)
-			?.let {
-				this.bluetoothThread = BluetoothInitializationThread(it)
-				this.bluetoothThread.start()
-			}
 	}
 
 	/**
@@ -92,8 +75,6 @@ class MainActivity : AppCompatActivity() {
 	@RequiresApi(Build.VERSION_CODES.S)
 	override fun onDestroy() {
 		super.onDestroy()
-
-		this.movementHandler.setAction(Action.STOP)
 		this.bluetoothThread.cancel()
 	}
 
@@ -220,22 +201,8 @@ class MainActivity : AppCompatActivity() {
 	@RequiresApi(Build.VERSION_CODES.S)
 	private inner class BluetoothInitializationThread(device: BluetoothDevice) : Thread() {
 		private val bluetoothSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
-			if (ActivityCompat.checkSelfPermission(
-					this@MainActivity,
-					Manifest.permission.BLUETOOTH_CONNECT
-				) == PackageManager.PERMISSION_DENIED
-			) {
-				ActivityCompat.requestPermissions(
-					this@MainActivity,
-					arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
-					1
-				)
-
-				return@lazy null
-			}
-
 			try {
-				return@lazy device.createRfcommSocketToServiceRecord(UUID.fromString(BLUETOOTH_UUID))
+				return@lazy device.createInsecureRfcommSocketToServiceRecord(UUID.fromString(BLUETOOTH_UUID))
 			} catch (e: SecurityException) {
 				Log.e(TAG, "Socket's create() method failed. Permissions required by user", e)
 			}
@@ -249,24 +216,22 @@ class MainActivity : AppCompatActivity() {
 		override fun run() {
 			Log.d(TAG, "BluetoothInitializationThread started")
 
-			// Cancel discovery because it otherwise slows down the connection.
-			if (ActivityCompat.checkSelfPermission(
-					this@MainActivity,
-					Manifest.permission.BLUETOOTH_SCAN
-				) == PackageManager.PERMISSION_DENIED
-			) {
-				return
-			}
-			bluetoothAdapter.cancelDiscovery()
+			try {
+				this.bluetoothSocket?.let {
+					// Connect to the remote device through the socket. This call blocks
+					// until it succeeds or throws an exception.
+					it.connect()
 
-			bluetoothSocket?.let {
-				// Connect to the remote device through the socket. This call blocks
-				// until it succeeds or throws an exception.
-				it.connect()
-
-				// The connection attempt succeeded. Perform work associated with
-				// the connection in a separate thread.
-				setSocket(it)
+					// The connection attempt succeeded. Perform work associated with
+					// the connection in a separate thread.
+					setSocket(it)
+				}
+			} catch (e: SecurityException) {
+				// Unable to connect; close the socket and return.
+				Log.e(TAG, "Permission denied", e)
+			} catch (e: Exception) {
+				// Unable to connect; close the socket and return.
+				Log.e(TAG, "Socket's connect() method failed", e)
 			}
 		}
 
@@ -291,8 +256,12 @@ class MainActivity : AppCompatActivity() {
 	 */
 	private fun setSocket(bluetoothSocket: BluetoothSocket) {
 		this.movementHandler.bluetoothSocket = bluetoothSocket
-		this.connectBluetoothButton.isEnabled = false
-		this.connectBluetoothButton.text = this.getString(R.string.connected)
 		this.movementHandler.start()
+	}
+
+	@RequiresApi(Build.VERSION_CODES.S)
+	fun connectBluetooth(view: View) {
+		this.findAndConnectBluetoothDevice()
+		this.connectBluetoothButton.isEnabled = false
 	}
 }

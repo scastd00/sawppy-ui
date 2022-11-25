@@ -1,7 +1,6 @@
 package es.unileon.sawppy.ui
 
 import android.bluetooth.BluetoothSocket
-import android.util.Log
 import java.util.Timer
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.timer
@@ -30,8 +29,6 @@ class MovementHandler {
 		) {
 			val action = actionToSend.get()
 			sendBytes(action.toString())
-
-			Log.d("MovementHandler", "Sending action: $action")
 
 			// When a control action was sent, the rover will stop moving in the next iteration.
 			if (action.isControl())
