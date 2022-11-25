@@ -7,7 +7,7 @@
 	<color name="teal_700">#FF018786</color>
 	<color name="black">#FF000000</color>
 	<color name="white">#FFFFFFFF</color>
-	<color name="enabled_control_button">#FBC02D</color>
-	<color name="disabled_control_button">#33FBC02D</color>
-	<color name="pressed_control_button">#64DD17</color>
+	<color name="control_button">#FBC02D</color>
+	<color name="connect_button">#64DD17</color>
+	<color name="disconnect_button">#D50000</color>
 </resources>

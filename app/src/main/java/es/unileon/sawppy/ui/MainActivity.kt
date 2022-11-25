@@ -9,8 +9,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import kotlinx.android.synthetic.main.activity_main.automaticControlButton
 import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
@@ -28,6 +28,14 @@ import java.util.UUID
 class MainActivity : AppCompatActivity() {
 	private val movementHandler: MovementHandler = MovementHandler()
 	private val bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+	private val imageButtons: Array<ImageButton> by lazy {
+		arrayOf(
+			this.buttonForward,
+			this.buttonBackwards,
+			this.buttonLeft,
+			this.buttonRight
+		)
+	}
 
 	/**
 	 * Called when the activity is created.
@@ -41,6 +49,10 @@ class MainActivity : AppCompatActivity() {
 		super.onCreate(savedInstanceState)
 		this.setContentView(R.layout.activity_main)
 		this.prepareTouchListeners()
+
+		this.stateOfButtons(true)
+		this.setColorToButton(this.connectButton, R.color.connect_button)
+		this.setColorToButton(this.disconnectButton, R.color.disconnect_button, 0.4F)
 	}
 
 	private fun moveForward() = this.movementHandler.setAction(Action.FORWARD)
@@ -64,11 +76,7 @@ class MainActivity : AppCompatActivity() {
 	 */
 	private fun keepPressedButtonBackground(view: View) {
 		this.stateOfButtons(true)
-		ViewCompat.setBackgroundTintList(
-			view, ColorStateList.valueOf(
-				this.getColor(R.color.pressed_control_button)
-			)
-		)
+		this.setColorToButton(view, R.color.control_button)
 	}
 
 	/**
@@ -114,31 +122,20 @@ class MainActivity : AppCompatActivity() {
 	 * See "https://devexperto.com/kotlin-android-extensions" for better understanding of the syntax.
 	 */
 	private fun stateOfButtons(enabled: Boolean) {
-		arrayOf(
-			this.buttonForward,
-			this.buttonBackwards,
-			this.buttonLeft,
-			this.buttonRight
-		).forEach {
+		this.imageButtons.forEach {
 			it.isEnabled = enabled
-			ViewCompat.setBackgroundTintList(
-				it, ColorStateList.valueOf(
-					this.getColor(
-						if (enabled) R.color.enabled_control_button else R.color.disabled_control_button
-					)
-				)
-			)
+
+			if (enabled) setColorToButton(it, R.color.control_button, 0.75F)
+			else setColorToButton(it, R.color.control_button, 0.4F)
 		}
 	}
 
+	/**
+	 * Assigns the action to be performed when a button is pressed.
+	 */
 	@SuppressLint("ClickableViewAccessibility")
 	private fun prepareTouchListeners() {
-		arrayOf(
-			this.buttonForward,
-			this.buttonBackwards,
-			this.buttonLeft,
-			this.buttonRight
-		).forEach {
+		this.imageButtons.forEach {
 			it.setOnTouchListener { view, event ->
 				when (event.action) {
 					MotionEvent.ACTION_DOWN -> {
@@ -158,6 +155,17 @@ class MainActivity : AppCompatActivity() {
 				true
 			}
 		}
+	}
+
+	/**
+	 * Helper method to set the background color of a button.
+	 *
+	 * @param view The button.
+	 * @param color The color to set. If not specified, the color is set to transparent.
+	 */
+	private fun setColorToButton(view: View, color: Int, opacity: Float = 1f) {
+		view.backgroundTintList = ColorStateList.valueOf(this.getColor(color))
+		view.alpha = opacity - 0.1f
 	}
 
 	/**
@@ -183,8 +191,7 @@ class MainActivity : AppCompatActivity() {
 			// the connection in a separate thread.
 			this.movementHandler.bluetoothSocket = bluetoothSocket
 			this.movementHandler.start()
-			this.connectButton.isEnabled = false
-			this.disconnectButton.isEnabled = true
+			this.switchConnectionButtons()
 		} catch (e: SecurityException) {
 			Log.e(TAG, "Error while creating the Bluetooth socket", e)
 		} catch (e: IOException) {
@@ -194,8 +201,19 @@ class MainActivity : AppCompatActivity() {
 
 	fun disconnect(view: View) {
 		this.movementHandler.stop()
+		this.switchConnectionButtons()
+	}
 
-		this.connectButton.isEnabled = true
-		this.disconnectButton.isEnabled = false
+	private fun switchConnectionButtons() {
+		this.connectButton.isEnabled = !this.connectButton.isEnabled
+		this.disconnectButton.isEnabled = !this.disconnectButton.isEnabled
+
+		if (this.connectButton.isEnabled) {
+			this.setColorToButton(this.connectButton, R.color.connect_button)
+			this.setColorToButton(this.disconnectButton, R.color.disconnect_button, 0.4F)
+		} else {
+			this.setColorToButton(this.connectButton, R.color.connect_button, 0.4F)
+			this.setColorToButton(this.disconnectButton, R.color.disconnect_button)
+		}
 	}
 }
