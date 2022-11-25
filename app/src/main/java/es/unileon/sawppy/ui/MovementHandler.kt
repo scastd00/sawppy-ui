@@ -60,12 +60,13 @@ class MovementHandler {
 	/**
 	 * Handles the end of the connection.
 	 */
-	fun end() {
+	fun stop() {
 		if (!isRunning) return
 
 		this.actionToSend.set(Action.STOP) // Set the action in case a new task is executed (last).
 		this.taskExecutor.cancel() // Cancel the timer.
 		this.sendBytes(Action.STOP.toString()) // Send stop signal to the rover ensure that it stops.
 		this.bluetoothSocket?.close() // Close the bluetooth socket.
+		this.isRunning = false // Set the isRunning attribute flag to false.
 	}
 }

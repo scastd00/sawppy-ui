@@ -7,6 +7,6 @@
 	<string name="title_activity_main">SawppyUI Controller</string>
 	<string name="manual_control">Manual control</string>
 	<string name="automatic_control">Automatic control</string>
-	<string name="connect_bluetooth">Connect Bluetooth</string>
-	<string name="connected">Bluetooth connected</string>
+	<string name="connect">Connect</string>
+	<string name="disconnect">Disconnect</string>
 </resources>

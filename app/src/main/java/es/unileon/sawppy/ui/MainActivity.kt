@@ -2,16 +2,13 @@ package es.unileon.sawppy.ui
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.ContentValues.TAG
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import kotlinx.android.synthetic.main.activity_main.automaticControlButton
@@ -19,7 +16,8 @@ import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
 import kotlinx.android.synthetic.main.activity_main.buttonRight
-import kotlinx.android.synthetic.main.activity_main.connectBluetoothButton
+import kotlinx.android.synthetic.main.activity_main.connectButton
+import kotlinx.android.synthetic.main.activity_main.disconnectButton
 import kotlinx.android.synthetic.main.activity_main.manualControlButton
 import java.io.IOException
 import java.util.UUID
@@ -30,7 +28,6 @@ import java.util.UUID
 class MainActivity : AppCompatActivity() {
 	private val movementHandler: MovementHandler = MovementHandler()
 	private val bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-	private lateinit var bluetoothThread: BluetoothInitializationThread
 
 	/**
 	 * Called when the activity is created.
@@ -40,42 +37,10 @@ class MainActivity : AppCompatActivity() {
 	 *
 	 * Retrieves the Bluetooth device and creates a new BluetoothInitializationThread to connect to it.
 	 */
-	@RequiresApi(Build.VERSION_CODES.S)
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		this.setContentView(R.layout.activity_main)
 		this.prepareTouchListeners()
-	}
-
-	/**
-	 * Finds the Bluetooth device and creates a new BluetoothInitializationThread to connect to it.
-	 *
-	 * Internet resources:
-	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/connect-bluetooth-devices
-	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/transfer-data
-	 */
-	@RequiresApi(Build.VERSION_CODES.S)
-	private fun findAndConnectBluetoothDevice() {
-		try {
-			val device = this.bluetoothAdapter.getRemoteDevice(BLUETOOTH_MAC)
-			this.bluetoothThread = BluetoothInitializationThread(device)
-			this.bluetoothThread.start()
-		} catch (e: SecurityException) {
-			Log.e(TAG, "Error while creating the Bluetooth socket", e)
-		}
-	}
-
-	/**
-	 * Called when the activity is destroyed.
-	 *
-	 * @see AppCompatActivity.onDestroy
-	 *
-	 * Stops the movement handler and closes the Bluetooth connection.
-	 */
-	@RequiresApi(Build.VERSION_CODES.S)
-	override fun onDestroy() {
-		super.onDestroy()
-		this.bluetoothThread.cancel()
 	}
 
 	private fun moveForward() = this.movementHandler.setAction(Action.FORWARD)
@@ -120,14 +85,6 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	/**
-	 * Alternates between the manual and automatic control buttons.
-	 */
-	private fun switchControlButtons() {
-		this.manualControlButton.isEnabled = !this.manualControlButton.isEnabled
-		this.automaticControlButton.isEnabled = !this.automaticControlButton.isEnabled
-	}
-
-	/**
 	 * Called when the automatic control button is clicked.
 	 *
 	 * @param view The view.
@@ -135,9 +92,17 @@ class MainActivity : AppCompatActivity() {
 	 * Disables all the control buttons.
 	 */
 	fun automaticControl(view: View) {
-		this.stateOfButtons(false)
-		this.switchControlButtons()
 		this.movementHandler.setAction(Action.AUTO)
+		this.switchControlButtons()
+		this.stateOfButtons(false)
+	}
+
+	/**
+	 * Alternates between the manual and automatic control buttons.
+	 */
+	private fun switchControlButtons() {
+		this.manualControlButton.isEnabled = !this.manualControlButton.isEnabled
+		this.automaticControlButton.isEnabled = !this.automaticControlButton.isEnabled
 	}
 
 	/**
@@ -196,72 +161,41 @@ class MainActivity : AppCompatActivity() {
 	}
 
 	/**
-	 * Thread that initializes the Bluetooth connection.
-	 */
-	@RequiresApi(Build.VERSION_CODES.S)
-	private inner class BluetoothInitializationThread(device: BluetoothDevice) : Thread() {
-		private val bluetoothSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
-			try {
-				return@lazy device.createInsecureRfcommSocketToServiceRecord(UUID.fromString(BLUETOOTH_UUID))
-			} catch (e: SecurityException) {
-				Log.e(TAG, "Socket's create() method failed. Permissions required by user", e)
-			}
-
-			return@lazy null
-		}
-
-		/**
-		 * Requests for permission to use the Bluetooth connection and creates the BluetoothSocket.
-		 */
-		override fun run() {
-			Log.d(TAG, "BluetoothInitializationThread started")
-
-			try {
-				this.bluetoothSocket?.let {
-					// Connect to the remote device through the socket. This call blocks
-					// until it succeeds or throws an exception.
-					it.connect()
-
-					// The connection attempt succeeded. Perform work associated with
-					// the connection in a separate thread.
-					setSocket(it)
-				}
-			} catch (e: SecurityException) {
-				// Unable to connect; close the socket and return.
-				Log.e(TAG, "Permission denied", e)
-			} catch (e: Exception) {
-				// Unable to connect; close the socket and return.
-				Log.e(TAG, "Socket's connect() method failed", e)
-			}
-		}
-
-		/**
-		 * Closes the client socket and causes the thread to finish.
-		 */
-		fun cancel() {
-			try {
-				// Since the socket that we created is assigned to the MovementHandler, we don't need to close it here.
-				// We close it in the MovementHandler (to send a message prior to closing it)
-				movementHandler.end()
-			} catch (e: IOException) {
-				Log.e(TAG, "Could not close the client socket", e)
-			}
-		}
-	}
-
-	/**
-	 * Sets the socket to the MovementHandler.
+	 * Finds the Bluetooth device and creates a new BluetoothInitializationThread to connect to it.
 	 *
-	 * @param bluetoothSocket The socket.
+	 * Internet resources:
+	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/connect-bluetooth-devices
+	 *  - https://developer.android.com/guide/topics/connectivity/bluetooth/transfer-data
 	 */
-	private fun setSocket(bluetoothSocket: BluetoothSocket) {
-		this.movementHandler.bluetoothSocket = bluetoothSocket
-		this.movementHandler.start()
+	fun connect(view: View) {
+		try {
+			this.bluetoothAdapter.cancelDiscovery()
+			val bluetoothSocket: BluetoothSocket =
+				this.bluetoothAdapter
+					.getRemoteDevice(BLUETOOTH_MAC)
+					.createInsecureRfcommSocketToServiceRecord(UUID.fromString(BLUETOOTH_UUID))
+
+			// Connect to the remote device through the socket. This call blocks
+			// until it succeeds or throws an exception.
+			bluetoothSocket.connect()
+
+			// The connection attempt succeeded. Perform work associated with
+			// the connection in a separate thread.
+			this.movementHandler.bluetoothSocket = bluetoothSocket
+			this.movementHandler.start()
+			this.connectButton.isEnabled = false
+			this.disconnectButton.isEnabled = true
+		} catch (e: SecurityException) {
+			Log.e(TAG, "Error while creating the Bluetooth socket", e)
+		} catch (e: IOException) {
+			Log.e(TAG, "Error while connecting to the Bluetooth device", e)
+		}
 	}
 
-	@RequiresApi(Build.VERSION_CODES.S)
-	fun connectBluetooth(view: View) {
-		this.findAndConnectBluetoothDevice()
-		this.connectBluetoothButton.isEnabled = false
+	fun disconnect(view: View) {
+		this.movementHandler.stop()
+
+		this.connectButton.isEnabled = true
+		this.disconnectButton.isEnabled = false
 	}
 }
