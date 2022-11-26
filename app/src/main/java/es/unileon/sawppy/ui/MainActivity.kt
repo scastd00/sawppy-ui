@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothSocket
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +27,7 @@ import java.util.UUID
  * Main activity of the application.
  */
 class MainActivity : AppCompatActivity() {
-	private val movementHandler: MovementHandler = MovementHandler()
+	private val movementHandler: MovementHandler = MovementHandler.INSTANCE
 	private val bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 	private val imageButtons: Array<ImageButton> by lazy {
 		arrayOf(
@@ -215,5 +216,11 @@ class MainActivity : AppCompatActivity() {
 			this.setColorToButton(this.connectButton, R.color.connect_button, 0.4F)
 			this.setColorToButton(this.disconnectButton, R.color.disconnect_button)
 		}
+	}
+
+	fun goToStatsActivity(view: View) {
+		val intent = Intent(this, StatsActivity::class.java)
+		startActivity(intent)
+		overridePendingTransition(R.anim.slide_from_right, R.anim.slide_to_left)
 	}
 }

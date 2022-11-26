@@ -1,12 +1,13 @@
 <resources>
-	<string name="app_name">SawppyUI</string>
-	<string name="move_forward">Moves the rover forward</string>
-	<string name="move_left">Moves the rover to the left</string>
-	<string name="move_right">Moves the rover to the right</string>
-	<string name="move_backwards">Moves the rover backwards</string>
-	<string name="title_activity_main">SawppyUI Controller</string>
-	<string name="manual_control">Manual control</string>
-	<string name="automatic_control">Automatic control</string>
-	<string name="connect">Connect</string>
-	<string name="disconnect">Disconnect</string>
+    <string name="app_name">SawppyUI</string>
+    <string name="move_forward">Moves the rover forward</string>
+    <string name="move_left">Moves the rover to the left</string>
+    <string name="move_right">Moves the rover to the right</string>
+    <string name="move_backwards">Moves the rover backwards</string>
+    <string name="title_activity_main">SawppyUI Controller</string>
+    <string name="manual_control">Manual control</string>
+    <string name="automatic_control">Automatic control</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="go_to_stats">Go to stats</string>
 </resources>

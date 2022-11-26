@@ -14,6 +14,10 @@ class MovementHandler {
 	private lateinit var taskExecutor: Timer
 	private var isRunning = false
 
+	companion object {
+		val INSTANCE: MovementHandler = MovementHandler()
+	}
+
 	/**
 	 * Starts the movement of the rover.
 	 */
