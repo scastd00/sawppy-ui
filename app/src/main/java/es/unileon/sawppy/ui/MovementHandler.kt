@@ -10,7 +10,7 @@ import kotlin.concurrent.timer
  */
 class MovementHandler {
 	var bluetoothSocket: BluetoothSocket? = null
-	private val actionToSend: AtomicReference<Action> = AtomicReference(Action.MANUAL)
+	private val actionToSend: AtomicReference<Action> = AtomicReference(Action.STOP)
 	private lateinit var taskExecutor: Timer
 	private var isRunning = false
 

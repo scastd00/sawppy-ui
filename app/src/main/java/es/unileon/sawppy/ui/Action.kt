@@ -24,7 +24,7 @@ data class Action(val signalToSend: Int) {
 	}
 
 	private fun getTypeNumber(): Int = this.signalToSend / 100
-	private fun getNumber(): Int = this.signalToSend % 100
+	private fun getNumber(): Int = this.signalToSend
 
 	fun isMovement(): Boolean = this.getTypeNumber() == 1
 	fun isControl(): Boolean = this.getTypeNumber() == 2
