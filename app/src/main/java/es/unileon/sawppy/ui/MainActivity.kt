@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_main.buttonBackwards
 import kotlinx.android.synthetic.main.activity_main.buttonForward
 import kotlinx.android.synthetic.main.activity_main.buttonLeft
 import kotlinx.android.synthetic.main.activity_main.buttonRight
+import kotlinx.android.synthetic.main.activity_main.buttonStop
 import kotlinx.android.synthetic.main.activity_main.connectButton
 import kotlinx.android.synthetic.main.activity_main.disconnectButton
 import kotlinx.android.synthetic.main.activity_main.manualControlButton
@@ -34,7 +35,8 @@ class MainActivity : AppCompatActivity() {
 			this.buttonForward,
 			this.buttonBackwards,
 			this.buttonLeft,
-			this.buttonRight
+			this.buttonRight,
+			this.buttonStop
 		)
 	}
 
@@ -54,19 +56,27 @@ class MainActivity : AppCompatActivity() {
 		this.stateOfButtons(true)
 		this.setColorToButton(this.connectButton, R.color.connect_button)
 		this.setColorToButton(this.disconnectButton, R.color.disconnect_button, 0.4F)
+
+		if (!this.bluetoothAdapter.isEnabled) {
+			try {
+				this.bluetoothAdapter.enable()
+			} catch (_: SecurityException) {
+			}
+		}
 	}
 
 	private fun moveForward() = this.movementHandler.setAction(Action.FORWARD)
 	private fun moveBackward() = this.movementHandler.setAction(Action.BACKWARD)
 	private fun moveLeft() = this.movementHandler.setAction(Action.LEFT)
 	private fun moveRight() = this.movementHandler.setAction(Action.RIGHT)
+	private fun stop() = this.movementHandler.setAction(Action.STOP)
 
 	/**
 	 * Establishes the Stop action to be sent by the MovementHandler and clears the
 	 * background of all buttons.
 	 */
-	private fun stop() {
-		this.movementHandler.setAction(Action.STOP)
+	private fun sendIgnored() {
+		this.movementHandler.setAction(Action.IGNORE_SIGNAL)
 		this.stateOfButtons(true)
 	}
 
@@ -145,12 +155,13 @@ class MainActivity : AppCompatActivity() {
 							R.id.buttonBackwards -> this.moveBackward()
 							R.id.buttonLeft -> this.moveLeft()
 							R.id.buttonRight -> this.moveRight()
+							R.id.buttonStop -> this.stop()
 						}
 
 						this.keepPressedButtonBackground(view)
 					}
 
-					MotionEvent.ACTION_UP -> this.stop()
+					MotionEvent.ACTION_UP -> this.sendIgnored()
 				}
 
 				true

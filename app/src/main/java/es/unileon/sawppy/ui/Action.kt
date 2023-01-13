@@ -18,13 +18,13 @@ data class Action(val signalToSend: Int) {
 		val BACKWARD = Action(102)
 		val LEFT = Action(103)
 		val RIGHT = Action(104)
-		val STOP = Action(105)
+		val IGNORE_SIGNAL = Action(105)
+		val STOP = Action(107)
 		val AUTO = Action(201)
 		val MANUAL = Action(202)
 	}
 
 	private fun getTypeNumber(): Int = this.signalToSend / 100
-	private fun getNumber(): Int = this.signalToSend
 
 	fun isMovement(): Boolean = this.getTypeNumber() == 1
 	fun isControl(): Boolean = this.getTypeNumber() == 2
@@ -49,6 +49,6 @@ data class Action(val signalToSend: Int) {
 			else -> throw IllegalArgumentException("Invalid action type")
 		}
 
-		return """{"$actionType": ${getNumber()}}"""
+		return """{"$actionType": ${this.signalToSend}}"""
 	}
 }
